@@ -74,22 +74,5 @@ for i = 1:Ncomp
         mpsf(:,:,:,i) = E'*(E*x); 
     end
 end
-mpsf = abs(mpsf)/max(abs(mpsf(:)));
-
-%% display result (if 2D)
-if ~is3D
-    M       =   Ncomp*psf_size(1);
-    N       =   Ncomp*psf_size(2);
-    im   =   zeros(M,N);
-
-    for c = 1:Ncomp
-        for cc = 1:Ncomp
-            im((c-1)*psf_size(1)+1:c*psf_size(1),(cc-1)*psf_size(2)+1:cc*psf_size(2)) = mpsf(:,:,c,cc);
-        end
-    end
-
-    imshow(log10(im),[],'colormap',jet);
-    caxis([-2,0])
-end
 
 end

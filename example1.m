@@ -36,6 +36,7 @@ end
 legend('encoding 1', 'encoding 2','encoding 3','encoding 4')
 axis equal
 title('different spokes each encoding')
+drawnow
 %% 2. Choose encoding matrix
 %   We will use a 4x4 hadamard encoding scheme
 
@@ -49,13 +50,17 @@ H = [-1 -1 -1  1;...
 %   approximately uniform sampling R = 64*pi*0.5/10 = approx. 10. We assume
 %   that every component has equal energy.
 
-pause(1)
 figure(2)
 mpsf1 = m_psf(k1, H, [64 64]);
+imshow_mpsf(mpsf1,[-5,-3])
 title('m-PSF for same spokes every encoding')
+drawnow
 
-pause(1)
 figure(3)
 mpsf2 = m_psf(k2, H, [64 64]);
+imshow_mpsf(mpsf2,[-5,-3])
 title('m-PSF for different spokes each encoding')
- 
+drawnow
+
+%% 4. Analysis of m-PSFs
+
