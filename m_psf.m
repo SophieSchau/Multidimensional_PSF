@@ -74,5 +74,5 @@ for i = 1:Ncomp
         mpsf(:,:,:,i) = E'*(E*x); 
     end
 end
-
+mpsf = mpsf*max(intensity_norm(:))/max(mpsf(:));
 end

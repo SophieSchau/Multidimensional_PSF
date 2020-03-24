@@ -1,8 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   Simple example for how to use the m_PSF    %
-%                                              %
-%   Sophie Schauman 2020                       %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Simple example for how to generate the m_PSF    %
+%                                                   %
+%   Sophie Schauman 2020                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear
 close all
@@ -27,6 +27,7 @@ end
 legend('encoding 1', 'encoding 2','encoding 3','encoding 4')
 axis equal
 title('same spokes every encoding')
+drawnow
 
 subplot(1,2,2)
 for enc = 1:4
@@ -52,15 +53,12 @@ H = [-1 -1 -1  1;...
 
 figure(2)
 mpsf1 = m_psf(k1, H, [64 64]);
-imshow_mpsf(mpsf1,[-5,-3])
+imshow_mpsf(mpsf1,[-2,-0])
 title('m-PSF for same spokes every encoding')
 drawnow
 
 figure(3)
 mpsf2 = m_psf(k2, H, [64 64]);
-imshow_mpsf(mpsf2,[-5,-3])
+imshow_mpsf(mpsf2,[-2,-0])
 title('m-PSF for different spokes each encoding')
 drawnow
-
-%% 4. Analysis of m-PSFs
-
