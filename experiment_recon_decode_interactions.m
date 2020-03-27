@@ -14,7 +14,7 @@ phantomname = 'phantom64x64';
 N_augmentations = 10;
 N_noise_instances = 10;
 N_total_spokes = 16;
-full_bg_supp = false;
+full_bg_supp = true;
 lambda = 5;
 
 load(['data/' phantomname], 'GT');
@@ -176,7 +176,7 @@ for aug = 1:N_augmentations
 end
 
 %% 5. Vizualise result
-
+figure(1)
 rsquare_same_decode_recon_mean = mean(rsquare_same_decode_recon(:));
 rsquare_same_recon_decode_mean = mean(rsquare_same_recon_decode(:));
 rsquare_same_joint_mean = mean(rsquare_same_joint(:));
@@ -187,6 +187,106 @@ rsquare_vary_joint_mean = mean(rsquare_vary_joint(:));
 rsquare_alt_recon_decode_mean = mean(rsquare_alt_recon_decode(:));
 rsquare_alt_joint_mean = mean(rsquare_alt_joint(:));
 
-barh([rsquare_same_decode_recon_mean 0 0;...
+
+rsquare_same_decode_recon_sd = std(rsquare_same_decode_recon(:));
+rsquare_same_recon_decode_sd = std(rsquare_same_recon_decode(:));
+rsquare_same_joint_sd = std(rsquare_same_joint(:));
+
+rsquare_vary_recon_decode_sd = std(rsquare_vary_recon_decode(:));
+rsquare_vary_joint_sd = std(rsquare_vary_joint(:));
+
+rsquare_alt_recon_decode_sd = std(rsquare_alt_recon_decode(:));
+rsquare_alt_joint_sd = std(rsquare_alt_joint(:));
+
+categories = {'same spokes each encoding', 'varying spokes each encoding', 'alternating method (bg nulling)'};
+
+
+
+data_means = [rsquare_same_decode_recon_mean 0 0;...
       rsquare_same_recon_decode_mean, rsquare_vary_recon_decode_mean, rsquare_alt_recon_decode_mean;...
-      rsquare_same_joint_mean, rsquare_vary_joint_mean, rsquare_alt_joint_mean]')
+      rsquare_same_joint_mean, rsquare_vary_joint_mean, rsquare_alt_joint_mean]';
+data_sds = [rsquare_same_decode_recon_sd 0 0;...
+      rsquare_same_recon_decode_sd, rsquare_vary_recon_decode_sd, rsquare_alt_recon_decode_sd;...
+      rsquare_same_joint_sd, rsquare_vary_joint_sd, rsquare_alt_joint_sd]'; 
+% Creating axes and the bar graph
+h = barh(data_means,'BarWidth',1);
+yticklabels(categories)
+hold on;
+% Finding the number of groups and the number of bars in each group
+ngroups = size(data_means, 1);
+nbars = size(data_means, 2);
+% Calculating the width for each bar group
+groupwidth = min(0.8, nbars/(nbars + 1.5));
+% Set the position of each error bar in the centre of the main bar
+% Based on barweb.m by Bolu Ajiboye from MATLAB File Exchange
+for i = 1:nbars
+    % Calculate center of each bar
+    x = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
+    errorbar(data_means(:,i),x, data_sds(:,i),'horizontal','k', 'linestyle', 'none', 'linewidth', 1);
+
+end
+
+xlabel('R^2')
+legend('decode - reconstruct', 'reconstruct - decode', 'joint reconstruction and decoding', 'location', 'southoutside')
+
+set(gca,'FontSize',18)
+set(gcf,'Position',[124 359 876 439])
+
+if full_bg_supp
+    bg = 'suppressed background';
+else
+    bg = 'realistic background';
+end
+
+title(['Reconstruction quality - ' num2str(N_total_spokes) ' spokes - ' bg])
+axis([0,1,0,4])
+
+savefig(['data/analysis_figs/Reconstruction_quality-' num2str(N_total_spokes) 'spokes-' strrep(bg,' ','') '.fig'])
+saveas(gcf,['data/analysis_figs/Reconstruction_quality-' num2str(N_total_spokes) 'spokes-' strrep(bg,' ','') '.tif'])
+
+%% 6. Show example recons
+
+figure(2)
+aug = 1;
+n = 1;
+
+loadfilename = ['data/recons/' phantomname '_recons_spokes' num2str(N_total_spokes) '_lambda' num2str(lambda) '_pertubation' num2str(aug) '_noise' num2str(n) '_bgsupp' num2str(full_bg_supp) '.mat'];
+load(loadfilename);
+
+subplot(3,3,1)
+imshow(squeeze(abs(image_same_decode_recon(:,:,:,:,1:3)))/255,[])
+title({'same spokes', 'decode+reconstruct'})
+
+subplot(3,3,2)
+imshow(squeeze(abs(image_same_recon_decode(:,:,:,:,1:3)))/255,[])
+title({'same spokes', 'reconstruct+decode'})
+
+subplot(3,3,3)
+imshow(squeeze(abs(image_same_joint(:,:,:,:,1:3)))/255,[])
+title({'same spokes', 'joint reconstruction and decoding'})
+
+subplot(3,3,4)
+imshow(squeeze(abs(zeros(size(image_same_decode_recon(:,:,:,:,1:3)))))/255,[])
+
+subplot(3,3,5)
+imshow(squeeze(abs(image_vary_recon_decode(:,:,:,:,1:3)))/255,[])
+title({'varying spokes', 'reconstruct+decode'})
+
+subplot(3,3,6)
+imshow(squeeze(abs(image_vary_joint(:,:,:,:,1:3)))/255,[])
+title({'varying spokes', 'joint reconstruction and decoding'})
+
+subplot(3,3,7)
+imshow(squeeze(abs(zeros(size(image_same_decode_recon(:,:,:,:,1:3)))))/255,[])
+
+subplot(3,3,8)
+imshow(squeeze(abs(image_alt_recon_decode(:,:,:,:,1:3)))/255,[])
+title({'alternating spokes', 'reconstruct+decode'})
+
+subplot(3,3,9)
+imshow(squeeze(abs(image_alt_joint(:,:,:,:,1:3)))/255,[])
+title({'alternating spokes', 'joint reconstruction and decoding'})
+
+set(gcf,'Position',[124 1 945 797])
+savefig(['data/analysis_figs/Reconstruction-' num2str(N_total_spokes) 'spokes-' strrep(bg,' ','') '.fig'])
+saveas(gcf,['data/analysis_figs/Reconstruction-' num2str(N_total_spokes) 'spokes-' strrep(bg,' ','') '.tif'])
